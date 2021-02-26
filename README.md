@@ -10,6 +10,16 @@ Same rules as Black, only with two-space indents.
 
 It requires Python 3.6.0+ to run but you can reformat Python 2 code with it as well.
 
+## Usage
+
+    python -m cblack {source_file_or_directory}
+
+## Options
+
+    python -m cblack --help
+
+You can also go to https://github.com/psf/black for the latest options available
+
 ## Why
 
 After [a long discussion](https://github.com/ambv/black/issues/378) about indentation

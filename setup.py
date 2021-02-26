@@ -40,7 +40,7 @@ setup(
     package_data={},
     python_requires=">=3.6",
     zip_safe=False,
-    install_requires=["black>=18.9b0"],
+    install_requires=["black>=20.8b1"],
     extras_require={},
     classifiers=[
         "Development Status :: 4 - Beta",
