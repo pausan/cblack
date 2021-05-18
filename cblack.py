@@ -8,7 +8,7 @@ import black
 __version__ = '0.9.1'
 
 _orgLineStr = black.Line.__str__
-_orgFixDocString = black.fix_docstring
+_orgFixDocString = black.strings.fix_docstring
 
 def lineStrIndentTwoSpaces(self) -> str:
   """ Intended to replace Line.__str__ to produce 2-space indentation blocks
@@ -31,7 +31,7 @@ def fixDocString(docstring, prefix):
   return _orgFixDocString(docstring, ' ' * (len(prefix) >> 1))
 
 black.Line.__str__ = lineStrIndentTwoSpaces
-black.fix_docstring = fixDocString
+black.strings.fix_docstring = fixDocString
 
 def main ():
   # behabe like normal black code
