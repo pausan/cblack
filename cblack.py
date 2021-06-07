@@ -3,7 +3,13 @@
 import re
 import sys
 
-import black
+from black import main as black_main
+
+try:
+  import black.linegen as black
+except ImportError:
+  import black
+
 
 __version__ = "0.9.1"
 
@@ -39,7 +45,7 @@ black.fix_docstring = fixDocString
 def main():
   # behabe like normal black code
   sys.argv[0] = re.sub(r"(-script\.pyw?|\.exe)?$", "", sys.argv[0])
-  sys.exit(black.main())
+  sys.exit(black_main())
 
 
 if __name__ == "__main__":
