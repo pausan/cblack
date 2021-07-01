@@ -8,7 +8,7 @@ Same rules as Black, only with two-space indents.
 
 *cblack* can be installed by running `pip3 install cblack`.
 
-It requires Python 3.6.0+ to run but you can reformat Python 2 code with it as well.
+It requires Python 3.6.2+ to run but you can reformat Python 2 code with it as well.
 
 ## Usage
 
@@ -52,6 +52,19 @@ would still be the same.
 - prettier in node
 - gofmt in go
 - rustfmt in rust
+
+## Versioning
+
+This project will try to follow the same versioning as black itself, so any
+changes introduced in black formatting will be reflected in this project as well.
+
+As black project states:
+
+     This is made explicit by the “Beta” trove classifier, as well as by 
+     the “b” in the version number. What this means for you is that until
+     the formatter becomes stable, you should expect some formatting to change
+     in the future.
+
 
 ## Credits
 

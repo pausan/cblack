@@ -4,7 +4,7 @@ import re
 from setuptools import setup
 import sys
 
-assert sys.version_info >= (3, 6, 0), "cblack requires Python 3.6+"
+assert sys.version_info >= (3, 6, 2), "cblack requires Python 3.6+"
 from pathlib import Path  # noqa E402
 
 CURRENT_DIR = Path(__file__).parent
@@ -39,9 +39,9 @@ setup(
     py_modules=["cblack"],
     packages=[],
     package_data={},
-    python_requires=">=3.6",
+    python_requires=">=3.6.2",
     zip_safe=False,
-    install_requires=["black==21.5b2"],
+    install_requires=["black==21.6b0"],
     extras_require={},
     classifiers=[
         "Development Status :: 4 - Beta",
