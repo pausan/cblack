@@ -11,7 +11,7 @@ except ImportError:
   import black
 
 
-__version__ = "21.6b0"
+__version__ = "22.3.0"
 
 _orgLineStr = black.Line.__str__
 _orgFixDocString = black.fix_docstring
