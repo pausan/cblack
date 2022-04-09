@@ -1,9 +1,11 @@
 #!/bin/bash
 
-# Very simple test. It formats the "unformatted.py" file into "reformatted.py"
-# and checks if it looks the same as "expected.py"
+# Very simple test. It formats the "$1_unformatted.py" file into "$1_reformatted.py"
+# and checks if it looks the same as "$1_expected.py"
 
 set -e
+
+PYTHON_VERSION=$1
 
 err_report() {
   echo "ERROR: Test failed. Unexpected formatting, have a look at the diff"
@@ -11,9 +13,9 @@ err_report() {
 
 trap 'err_report' ERR
 
-cat "test/unformatted.py" | python3 cblack.py -q - > test/reformatted.py
+cat "test/${PYTHON_VERSION}_unformatted.py" | python3 cblack.py -q - > test/${PYTHON_VERSION}_reformatted.py
 
-diff test/expected.py test/reformatted.py
+diff test/${PYTHON_VERSION}_expected.py test/${PYTHON_VERSION}_reformatted.py
 
-echo "Test Succeeded!"
+echo "Test ${PYTHON_VERSION} Succeeded!"
 exit 0

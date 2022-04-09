@@ -23,4 +23,4 @@ jobs:
           python3 setup.py install
 
       - name: Run the test
-        run: "${{ github.workspace }}/test.sh"
+        run: "${{ github.workspace }}/test.sh" "${{ matrix.python-version }}"
