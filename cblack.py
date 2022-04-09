@@ -3,18 +3,74 @@
 import re
 import sys
 
-from black import main as black_main
-
-try:
-  import black.linegen as black
-except ImportError:
-  import black
-
-
 __version__ = "22.3.0"
 
-_orgLineStr = black.Line.__str__
-_orgFixDocString = black.fix_docstring
+import sys
+from os.path import isdir
+
+import importlib
+import importlib.util
+import importlib.machinery
+
+
+_real_pathfinder = sys.meta_path[-1]
+
+
+class CBlackModuleLoader(type(_real_pathfinder)):
+  """
+  This custom module loader is used in order to prevent black to load a
+  dynamic library as the module, and load the python module instead.
+
+  This is done for the later black monkeypatching to work. Otherwise binaries
+  cannot be patched.
+
+  Please note that this should not prevent other libraries from loading their
+  dynamic library modules. So everything will load as expected but black module.
+
+  Reference:
+    https://stupidpythonideas.blogspot.com/2015/06/hacking-python-without-hacking-python.html
+  """
+
+  # all "black" folders contain the substring "/black-<version>"
+  # (e.g "/usr/local/lib/python3.8/site-packages/black-22.3.0-py3.8-linux-x86_64.egg")
+  _black_folder = "/black-%s" % __version__
+
+  @classmethod
+  def find_module(cls, fullname, path=None):
+    """ """
+    spec = _real_pathfinder.find_spec(fullname, path)
+    if (
+      spec
+      and (CBlackModuleLoader._black_folder in spec.origin)
+      and spec.origin.endswith(".so")
+    ):
+      # replace known dynamic loader module extensions by their "py" counterpart
+      location = spec.origin
+      for ext in importlib.machinery.EXTENSION_SUFFIXES:
+        if location.endswith(ext):
+          location = location.replace(ext, ".py")
+          break
+
+      # load & replace the spec from the python file
+      spec = importlib.util.spec_from_file_location(spec.name, location)
+
+    if not spec:
+      return spec
+    return spec.loader
+
+
+# Replace the real module loader by our own
+sys.meta_path[-1] = CBlackModuleLoader
+
+try:
+  import black.strings as black_str
+  import black.linegen as black_line
+  from black import main as black_main
+except ImportError:
+  print("Cannot import black. Have you installed black v%s?" % __version__)
+
+_orgLineStr = black_line.Line.__str__
+_orgFixDocString = black_str.fix_docstring
 
 
 def lineStrIndentTwoSpaces(self) -> str:
@@ -39,8 +95,9 @@ def fixDocString(docstring, prefix):
 
 
 # Patch original black formatter function
-black.Line.__str__ = lineStrIndentTwoSpaces
-black.fix_docstring = fixDocString
+black_line.Line.__str__ = lineStrIndentTwoSpaces
+black_line.fix_docstring = fixDocString
+black_str.fix_docstring = fixDocString
 
 
 def main():
