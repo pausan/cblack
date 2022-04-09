@@ -8,7 +8,11 @@ Same rules as Black, only with two-space indents.
 
 *cblack* can be installed by running `pip3 install cblack`.
 
-It requires Python 3.6.2+ to run but you can reformat Python 2 code with it as well.
+It requires Python 3.7+ to run but you can reformat Python 2 and Python 3.x code
+as well (although you should run cblack with a Python 3.7+ interpreter).
+
+NOTE: Running cblack with Python 3.6 is no longer supported since black itself
+is failing as well.
 
 ## Usage
 
