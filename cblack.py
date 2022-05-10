@@ -67,10 +67,11 @@ try:
   import black.linegen as black_line
   from black import main as black_main
 except ImportError:
-  print("Cannot import black. Have you installed black v%s?" % __version__)
+  raise ImportError("Cannot import black. Have you installed black v%s?" % __version__)
 
 _orgLineStr = black_line.Line.__str__
 _orgFixDocString = black_str.fix_docstring
+_orgBracketSplit = black_line.bracket_split_build_line
 
 
 def lineStrIndentTwoSpaces(self) -> str:
@@ -94,9 +95,17 @@ def fixDocString(docstring, prefix):
   return _orgFixDocString(docstring, " " * (len(prefix) >> 1))
 
 
+def bracketSplitBuildLine(*args, is_body: bool = False, **kwargs):
+  result = _orgBracketSplit(*args, **kwargs, is_body=is_body)
+  if is_body:
+    result.depth += 1
+  return result
+
+
 # Patch original black formatter function
 black_line.Line.__str__ = lineStrIndentTwoSpaces
 black_line.fix_docstring = fixDocString
+black_line.bracket_split_build_line = bracketSplitBuildLine
 black_str.fix_docstring = fixDocString
 
 

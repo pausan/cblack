@@ -8,28 +8,28 @@ accordingly.
 """
 
 from x import (
-  a,
-  b,
-  c,
+    a,
+    b,
+    c,
 )
 
 
 A_GLOBAL_SET = {
-  # a comment
-  # another comment
-  "a string",
-  "another string",
-  # another comment
-  "yet another string",
+    # a comment
+    # another comment
+    "a string",
+    "another string",
+    # another comment
+    "yet another string",
 }
 
 
 def lookAtThisMethod(
-  first_parameter,
-  second_paramter=None,
-  third_parameter=32,
-  fourth_parameter="a short string as default argument",
-  **kwargs
+    first_parameter,
+    second_paramter=None,
+    third_parameter=32,
+    fourth_parameter="a short string as default argument",
+    **kwargs
 ):
   """The point of this is see how it reformats parameters
 
@@ -40,10 +40,10 @@ def lookAtThisMethod(
   We are done!
   """
   return kwargs["whatever"](
-    first_parameter * third_parameter,
-    second_paramter,
-    fourth_parameter,
-    "extra string because I want to",
+      first_parameter * third_parameter,
+      second_paramter,
+      fourth_parameter,
+      "extra string because I want to",
   )
 
 
@@ -56,31 +56,31 @@ def main():
     raise app.UsageError("Too many command-line arguments.")
 
   x = (
-    "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "
-    "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+      "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa "
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
   )
 
   y = [
-    1,
-    2,
-    [
-      3,
-    ],
+      1,
+      2,
+      [
+          3,
+      ],
   ]
 
   z = {
-    "another": "map",
-    "of": 3,
-    "values": [
-      12345678,
-      12345678,
-      12345678,
-      12345678,
-      12345678,
-      12345678,
-      12345678,
-      12345678,
-    ],
+      "another": "map",
+      "of": 3,
+      "values": [
+          12345678,
+          12345678,
+          12345678,
+          12345678,
+          12345678,
+          12345678,
+          12345678,
+          12345678,
+      ],
   }
 
 
