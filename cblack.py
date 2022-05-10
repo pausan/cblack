@@ -40,9 +40,9 @@ class CBlackModuleLoader(type(_real_pathfinder)):
     """ """
     spec = _real_pathfinder.find_spec(fullname, path)
     if (
-      spec
-      and (CBlackModuleLoader._black_folder in spec.origin)
-      and spec.origin.endswith(".so")
+        spec
+        and (CBlackModuleLoader._black_folder in spec.origin)
+        and spec.origin.endswith(".so")
     ):
       # replace known dynamic loader module extensions by their "py" counterpart
       location = spec.origin
