@@ -13,6 +13,12 @@ err_report() {
 
 trap 'err_report' ERR
 
+if tty --quiet; then
+  # enable debugging with [PuDB](https://youtu.be/bJYkCWPs_UU)
+  export PUDB_TTY
+  PUDB_TTY="$(tty)"
+fi
+
 PYTHON_VERSION2="$(python3 -c 'if True:
     import sys
     major, minor = sys.version_info[:2]
