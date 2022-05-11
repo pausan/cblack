@@ -8,9 +8,9 @@ accordingly.
 """
 
 from x import (
-  a,
-  b,
-  c,
+        a,
+    b,
+    c,
 )
 
 

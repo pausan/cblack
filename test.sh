@@ -33,7 +33,7 @@ fi
 
 cat "test/${PYTHON_VERSION}_unformatted.py" | python3 cblack.py -q - > test/${PYTHON_VERSION}_reformatted.py
 
-diff -u --color=auto test/${PYTHON_VERSION}_expected.py test/${PYTHON_VERSION}_reformatted.py
+diff -u --color=always test/${PYTHON_VERSION}_expected.py test/${PYTHON_VERSION}_reformatted.py
 
 echo "Test ${PYTHON_VERSION} Succeeded!"
 exit 0
