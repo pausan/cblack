@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 # -*- coding: utf-8 -*-
+import contextlib
 import re
 import sys
 
@@ -9,68 +10,80 @@ import sys
 from os.path import isdir
 
 import importlib
+import importlib.abc
 import importlib.util
 import importlib.machinery
 
 
-_real_pathfinder = sys.meta_path[-1]
+@contextlib.contextmanager
+def prevent_metapath_recursion(cls):
+  orig_meta_path = tuple(sys.meta_path)
+  while cls in sys.meta_path:
+    sys.meta_path.remove(cls)
+  yield
+  sys.meta_path[:] = orig_meta_path
 
 
-class CBlackModuleLoader(type(_real_pathfinder)):
+class MonkeypatchEnablingBlackModuleFinder(importlib.abc.MetaPathFinder):
   """
-  This custom module loader is used in order to prevent black to load a
-  dynamic library as the module, and load the python module instead.
+  This custom module finder is used in order to prevent black to load a
+  binary as the module, and load the pure-python module instead.
 
   This is done for the later black monkeypatching to work. Otherwise binaries
   cannot be patched.
-
-  Please note that this should not prevent other libraries from loading their
-  dynamic library modules. So everything will load as expected but black module.
 
   Reference:
     https://stupidpythonideas.blogspot.com/2015/06/hacking-python-without-hacking-python.html
   """
 
-  # all "black" folders contain the substring "/black-<version>"
-  # (e.g "/usr/local/lib/python3.8/site-packages/black-22.3.0-py3.8-linux-x86_64.egg")
-  _black_folder = "/black-%s" % __version__
-
   @classmethod
-  def find_module(cls, fullname, path=None):
+  def find_spec(cls, fullname, path, target=None):
     """ """
-    spec = _real_pathfinder.find_spec(fullname, path)
-    if (
-      spec
-      and (CBlackModuleLoader._black_folder in spec.origin)
-      and spec.origin.endswith(".so")
+    if fullname not in (
+        # only need to monkeypatch those two modules
+        "black.strings",
+        "black.linegen",
+        # segfault if we don't also pythonize the parent `black` module
+        "black",
     ):
-      # replace known dynamic loader module extensions by their "py" counterpart
-      location = spec.origin
-      for ext in importlib.machinery.EXTENSION_SUFFIXES:
-        if location.endswith(ext):
-          location = location.replace(ext, ".py")
-          break
+      return None
 
-      # load & replace the spec from the python file
-      spec = importlib.util.spec_from_file_location(spec.name, location)
+    # find what the spec "would have been" without this finder
+    with prevent_metapath_recursion(cls):
+      # I wasn't able to find a public api for this:
+      spec = importlib._bootstrap._find_spec(fullname, path)
 
-    if not spec:
+    if not (spec and spec.origin):
+      # we only care if the other finders found a .so
       return spec
-    return spec.loader
+
+    # replace known dynamic loader module extensions by their "py" counterpart
+    for ext in importlib.machinery.EXTENSION_SUFFIXES:
+      if spec.origin.endswith(ext):
+
+        py_path = spec.origin.replace(ext, ".py")
+
+        # try to load & replace the spec from the .py path
+        py_spec = importlib.util.spec_from_file_location(spec.name, py_path)
+        if py_spec:
+          return py_spec
+    else:
+      return spec
 
 
-# Replace the real module loader by our own
-sys.meta_path[-1] = CBlackModuleLoader
+# override the usual module loaders with our own
+sys.meta_path.insert(0, MonkeypatchEnablingBlackModuleFinder)
 
 try:
   import black.strings as black_str
   import black.linegen as black_line
   from black import main as black_main
 except ImportError:
-  print("Cannot import black. Have you installed black v%s?" % __version__)
+  raise ImportError("Cannot import black. Have you installed black v%s?" % __version__)
 
 _orgLineStr = black_line.Line.__str__
 _orgFixDocString = black_str.fix_docstring
+_orgBracketSplit = black_line.bracket_split_build_line
 
 
 def lineStrIndentTwoSpaces(self) -> str:
@@ -94,9 +107,17 @@ def fixDocString(docstring, prefix):
   return _orgFixDocString(docstring, " " * (len(prefix) >> 1))
 
 
+def bracketSplitBuildLine(*args, is_body: bool = False, **kwargs):
+  result = _orgBracketSplit(*args, **kwargs, is_body=is_body)
+  if is_body:
+    result.depth += 1
+  return result
+
+
 # Patch original black formatter function
 black_line.Line.__str__ = lineStrIndentTwoSpaces
 black_line.fix_docstring = fixDocString
+black_line.bracket_split_build_line = bracketSplitBuildLine
 black_str.fix_docstring = fixDocString
 
 
