@@ -3,7 +3,7 @@
 import re
 import sys
 
-__version__ = "22.3.0"
+__version__ = "22.6.0"
 
 import sys
 from os.path import isdir
