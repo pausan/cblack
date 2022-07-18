@@ -35,13 +35,20 @@ class CBlackModuleLoader(type(_real_pathfinder)):
   # (e.g "/usr/local/lib/python3.8/site-packages/black-22.3.0-py3.8-linux-x86_64.egg")
   _black_folder = "/black-%s" % __version__
 
+  # local installation of black folder don't necessarily need to contain the
+  # version, so the path includes '/black/'
+  _black_local_folder = "/black/"
+
   @classmethod
   def find_module(cls, fullname, path=None):
     """ """
     spec = _real_pathfinder.find_spec(fullname, path)
     if (
       spec
-      and (CBlackModuleLoader._black_folder in spec.origin)
+      and (
+        (CBlackModuleLoader._black_folder in spec.origin)
+        or (CBlackModuleLoader._black_local_folder in spec.origin)
+      )
       and spec.origin.endswith(".so")
     ):
       # replace known dynamic loader module extensions by their "py" counterpart
