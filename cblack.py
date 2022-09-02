@@ -6,7 +6,7 @@ import sys
 __version__ = "22.6.0"
 
 import sys
-from os.path import isdir
+from pathlib import Path
 
 import importlib
 import importlib.util
@@ -31,25 +31,24 @@ class CBlackModuleLoader(type(_real_pathfinder)):
     https://stupidpythonideas.blogspot.com/2015/06/hacking-python-without-hacking-python.html
   """
 
-  # all "black" folders contain the substring "/black-<version>"
-  # (e.g "/usr/local/lib/python3.8/site-packages/black-22.3.0-py3.8-linux-x86_64.egg")
-  _black_folder = "/black-%s" % __version__
-
-  # local installation of black folder don't necessarily need to contain the
-  # version, so the path includes '/black/'
-  _black_local_folder = "/black/"
+  _black_folder_patterns = (
+    # all "black" folders contain the substring "/black-<version>"
+    # (e.g "/usr/local/lib/python3.8/site-packages/black-22.3.0-py3.8-linux-x86_64.egg")
+    "black-%s" % __version__,
+    # local installation of black folder don't necessarily need to contain the
+    # version, so the path includes '/black/'
+    "black",
+  )
 
   @classmethod
   def find_module(cls, fullname, path=None):
     """ """
     spec = _real_pathfinder.find_spec(fullname, path)
+    if not spec:
+      return spec
+
     if (
-      spec
-      and (
-        (CBlackModuleLoader._black_folder in spec.origin)
-        or (CBlackModuleLoader._black_local_folder in spec.origin)
-      )
-      and spec.origin.endswith(".so")
+      Path(spec.origin).parent.name in CBlackModuleLoader._black_folder_patterns
     ):
       # replace known dynamic loader module extensions by their "py" counterpart
       location = spec.origin
@@ -61,8 +60,6 @@ class CBlackModuleLoader(type(_real_pathfinder)):
       # load & replace the spec from the python file
       spec = importlib.util.spec_from_file_location(spec.name, location)
 
-    if not spec:
-      return spec
     return spec.loader
 
 
