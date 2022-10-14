@@ -108,7 +108,7 @@ black_str.fix_docstring = fixDocString
 
 
 def main():
-  # behabe like normal black code
+  # behave like normal black code
   sys.argv[0] = re.sub(r"(-script\.pyw?|\.exe)?$", "", sys.argv[0])
   sys.exit(black_main())
 
