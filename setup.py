@@ -41,7 +41,7 @@ setup(
     package_data={},
     python_requires=">=3.7.0",
     zip_safe=False,
-    install_requires=["black==22.6.0"],
+    install_requires=["black==24.3.0"],
     extras_require={},
     classifiers=[
         "Development Status :: 5 - Production/Stable",
